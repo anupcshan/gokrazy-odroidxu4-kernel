@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-const ubootRev = "801f71194c54c75e90d723b9be3434b6354fce71"
+const ubootRev = "13819f07ea6c60e87b708755a53954b8c0c99a32"
 const ubootTS = 1666063032
 
 var latest = "https://github.com/u-boot/u-boot/archive/" + ubootRev + ".zip"
@@ -70,6 +70,19 @@ func compile() error {
 	defconfig.Stderr = os.Stderr
 	if err := defconfig.Run(); err != nil {
 		return fmt.Errorf("make defconfig: %v", err)
+	}
+
+	f, err := os.OpenFile(".config", os.O_RDWR|os.O_APPEND, 0755)
+	if err != nil {
+		return err
+	}
+	// u-boot began failing boot around commit 13819f07ea6c60e87b708755a53954b8c0c99a32.
+	// CONFIG_BOARD_LATE_INIT tries to load CROS_EC, which clearly doesn't exist on HC2.
+	if _, err := f.Write([]byte("CONFIG_BOARD_LATE_INIT=n\n")); err != nil {
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
 	}
 
 	make := exec.Command("make", "u-boot.bin", "-j"+strconv.Itoa(runtime.NumCPU()))
