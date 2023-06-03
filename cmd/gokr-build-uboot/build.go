@@ -13,8 +13,8 @@ import (
 	"strings"
 )
 
-const ubootRev = "cb4437e530ec1ff3deae85754010344afab8bcc5"
-const ubootTS = 1685478221
+const ubootRev = "26659d426548d1c395ef878c3b820e53a6e3b346"
+const ubootTS = 1685722381
 
 var latest = "https://github.com/u-boot/u-boot/archive/" + ubootRev + ".zip"
 
