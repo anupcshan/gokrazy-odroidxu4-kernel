@@ -19,7 +19,7 @@ import (
 var configContents []byte
 
 // see https://www.kernel.org/releases.json
-var latest = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.4.12.tar.xz"
+var latest = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.5.tar.xz"
 
 const firmwareSource = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/%s?id=%s"
 const firmwareRevision = "eb8ea1b46893c42edbd516f971a93b4d097730ab"
@@ -219,7 +219,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := copyFile("/tmp/buildresult/exynos5422-odroidhc1.dtb", "arch/arm/boot/dts/exynos5422-odroidhc1.dtb"); err != nil {
+	if err := copyFile("/tmp/buildresult/exynos5422-odroidhc1.dtb", "arch/arm/boot/dts/samsung/exynos5422-odroidhc1.dtb"); err != nil {
 		log.Fatal(err)
 	}
 }
