@@ -55,6 +55,8 @@ jobs:
         gok -i bakery add .
         if gokr-has-label please-boot; then
             echo "Updating u-boot"
+            curl -s --user gokrazy:${GOKRAZY_BAKE_PASSWORD} http://${BAKE_HOST}/power
+            trap "curl -s --user gokrazy:${GOKRAZY_BAKE_PASSWORD} http://${BAKE_HOST}/power/off" EXIT
             curl -s --upload-file u-boot.bin --user gokrazy:${GOKRAZY_BAKE_PASSWORD} http://${BAKE_HOST}/update/device-specific/u-boot.bin
             echo "Test-booting"
             cd ~/gokrazy/bakery && GOARCH=arm gokr-boot -require_label=please-boot -set_label=please-merge -bootery_url=$BOOTERY_URL
