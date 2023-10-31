@@ -4,39 +4,19 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
-	"strings"
 )
 
 const ubootRev = "cbba1b7766bd93d74e28202c46e69095ac13760b"
 const ubootTS = 1698696114
 
-var latest = "https://github.com/u-boot/u-boot/archive/" + ubootRev + ".zip"
-
-func downloadUBoot() error {
-	out, err := os.Create(filepath.Base(latest))
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	resp, err := http.Get(latest)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if got, want := resp.StatusCode, http.StatusOK; got != want {
-		return fmt.Errorf("unexpected HTTP status code for %s: got %d, want %d", latest, got, want)
-	}
-	if _, err := io.Copy(out, resp.Body); err != nil {
-		return err
-	}
-	return out.Close()
-}
+const (
+	uBootRepo = "https://github.com/u-boot/u-boot"
+)
 
 func applyPatches(srcdir string) error {
 	patches, err := filepath.Glob("*.patch")
@@ -144,23 +124,8 @@ func copyFile(dest, src string) error {
 }
 
 func main() {
-	log.Printf("downloading uboot source: %s", latest)
-	if err := downloadUBoot(); err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("unpacking uboot source")
-	untar := exec.Command("unzip", "-q", filepath.Base(latest))
-	untar.Stdout = os.Stdout
-	untar.Stderr = os.Stderr
-	if err := untar.Run(); err != nil {
-		log.Fatalf("untar: %v", err)
-	}
-
-	srcdir := "u-boot-" + strings.TrimSuffix(filepath.Base(latest), ".zip")
-
-	log.Printf("applying patches")
-	if err := applyPatches(srcdir); err != nil {
+	tmpDir, err := os.MkdirTemp(os.TempDir(), "u-boot")
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -171,7 +136,28 @@ func main() {
 		bootCmdPath = p
 	}
 
-	if err := os.Chdir(srcdir); err != nil {
+	if err := os.Chdir(tmpDir); err != nil {
+		log.Fatal(err)
+	}
+
+	for _, cmd := range [][]string{
+		{"git", "init"},
+		{"git", "remote", "add", "origin", uBootRepo},
+		{"git", "fetch", "--depth=1", "origin", ubootRev},
+		{"git", "checkout", "FETCH_HEAD"},
+	} {
+		log.Printf("Running %s", cmd)
+		cmdObj := exec.Command(cmd[0], cmd[1:]...)
+		cmdObj.Stdout = os.Stdout
+		cmdObj.Stderr = os.Stderr
+		cmdObj.Dir = tmpDir
+		if err := cmdObj.Run(); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	log.Printf("applying patches")
+	if err := applyPatches(tmpDir); err != nil {
 		log.Fatal(err)
 	}
 

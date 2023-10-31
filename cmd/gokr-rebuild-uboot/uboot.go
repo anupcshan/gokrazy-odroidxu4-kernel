@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -15,9 +14,9 @@ import (
 )
 
 const dockerFileContents = `
-FROM debian:bullseye
+FROM debian:bookworm
 
-RUN apt-get update && apt-get install -y crossbuild-essential-armhf bc libssl-dev bison flex unzip
+RUN apt-get update && apt-get install -y crossbuild-essential-armhf bc libssl-dev bison flex git
 
 COPY gokr-build-uboot /usr/bin/gokr-build-uboot
 {{- range $idx, $path := .Patches }}
@@ -126,7 +125,7 @@ func main() {
 	// We explicitly use /tmp, because Docker only allows volume mounts under
 	// certain paths on certain platforms, see
 	// e.g. https://docs.docker.com/docker-for-mac/osxfs/#namespaces for macOS.
-	tmp, err := ioutil.TempDir("/tmp", "gokr-rebuild-uboot")
+	tmp, err := os.MkdirTemp("/tmp", "gokr-rebuild-uboot")
 	if err != nil {
 		log.Fatal(err)
 	}
