@@ -9,9 +9,14 @@ fatload mmc 2:1 0x40008000 vmlinuz
 # Emulate cmdline.txt behavior from Raspberry Pi devices.
 # Load cmdline.txt into memory (exact location doesn't matter, it shouldn't conflict with any other loads).
 fatload mmc 2:1 0x42000000 cmdline.txt
+setexpr cmdline_end 0x42000000 + ${filesize}
+# Write 0 byte to the end of cmdline.txt (to terminate the string).
+mw.w ${cmdline_end} 0 1
 # ... and set string value of var bootargs to it.
 # Requires CONFIG_CMD_SETEXPR=y while building u-boot.
 setexpr.s bootargs *0x42000000
+
+echo "Boot args: ${bootargs}"
 
 # Load dtb
 fatload mmc 2:1 0x44000000 exynos5422-odroidhc1.dtb
