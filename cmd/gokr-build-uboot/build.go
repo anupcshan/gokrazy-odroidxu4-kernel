@@ -58,7 +58,9 @@ func compile() error {
 	}
 	// u-boot began failing boot around commit 13819f07ea6c60e87b708755a53954b8c0c99a32.
 	// CONFIG_BOARD_LATE_INIT tries to load CROS_EC, which clearly doesn't exist on HC2.
-	if _, err := f.Write([]byte("CONFIG_CMD_SETEXPR=y\nCONFIG_BOARD_LATE_INIT=n\n")); err != nil {
+	// Starting 06ef8089f876b6dabf56caba31a05c003f03c629, it would stop booting after
+	// printing `Scanning mmc 2:1...`. Disabling GENERATE_SMBIOS_TABLE fixes that.
+	if _, err := f.Write([]byte("CONFIG_CMD_SETEXPR=y\nCONFIG_BOARD_LATE_INIT=n\nCONFIG_GENERATE_SMBIOS_TABLE=n\n")); err != nil {
 		return err
 	}
 	if err := f.Close(); err != nil {
