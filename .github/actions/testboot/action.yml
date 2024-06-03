@@ -28,6 +28,7 @@ runs:
         oauth-client-id: ${{ inputs.oauth-client-id }}
         oauth-secret: ${{ inputs.oauth-secret }}
         tags: tag:ci
+        version: 1.66.4
 
     - name: Test Boot
       env:
