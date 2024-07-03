@@ -16,7 +16,7 @@ import (
 const dockerFileContents = `
 FROM debian:bookworm
 
-RUN apt-get update && apt-get install -y crossbuild-essential-armhf bc libssl-dev bison flex git
+RUN apt-get update && apt-get install -y crossbuild-essential-armhf bc libssl-dev bison flex git uuid-dev libgnutls28-dev
 
 COPY gokr-build-uboot /usr/bin/gokr-build-uboot
 {{- range $idx, $path := .Patches }}
