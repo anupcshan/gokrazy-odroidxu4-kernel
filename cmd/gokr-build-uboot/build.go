@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-const ubootRev = "1312faac5f52d27cfb45dfe1a5a93a2944ca5c21"
+const ubootRev = "bfdfc6c12e8ca68fff1a7ed3892c180143a6a0ef"
 const ubootTS = 1725307673
 
 const (
@@ -138,10 +138,6 @@ func main() {
 		bootCmdPath = p
 	}
 
-	if err := os.Chdir(tmpDir); err != nil {
-		log.Fatal(err)
-	}
-
 	for _, cmd := range [][]string{
 		{"git", "init"},
 		{"git", "remote", "add", "origin", uBootRepo},
@@ -160,6 +156,10 @@ func main() {
 
 	log.Printf("applying patches")
 	if err := applyPatches(tmpDir); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := os.Chdir(tmpDir); err != nil {
 		log.Fatal(err)
 	}
 
