@@ -11,7 +11,7 @@ fatload mmc 2:1 0x40008000 vmlinuz
 fatload mmc 2:1 0x42000000 cmdline.txt
 setexpr cmdline_end 0x42000000 + ${filesize}
 # Write 0 byte to the end of cmdline.txt (to terminate the string).
-mw.w ${cmdline_end} 0 1
+mw.b ${cmdline_end} 0 1
 # ... and set string value of var bootargs to it.
 # Requires CONFIG_CMD_SETEXPR=y while building u-boot.
 setexpr.s bootargs *0x42000000
