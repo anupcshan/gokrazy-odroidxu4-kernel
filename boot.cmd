@@ -1,27 +1,27 @@
-# Hardcoded addresses to load vmlinuz and dtb copied from
-# https://www.hardkernel.com/blog-2/upstream-u-boot-for-odroid-xu4/
-
-# Expect all files to be on the first partition of the SD card (2:1)
+echo "Loading kernel ..."
 
 # Load compressed kernel image
-fatload mmc 2:1 0x40008000 vmlinuz
+load ${devtype} ${devnum}:${bootpart} ${kernel_addr_r} vmlinuz
 
 # Emulate cmdline.txt behavior from Raspberry Pi devices.
 # Load cmdline.txt into memory (exact location doesn't matter, it shouldn't conflict with any other loads).
-fatload mmc 2:1 0x42000000 cmdline.txt
-setexpr cmdline_end 0x42000000 + ${filesize}
+load ${devtype} ${devnum}:${bootpart} ${ramdisk_addr_r} cmdline.txt
+setexpr cmdline_end ${ramdisk_addr_r} + ${filesize}
 # Write 0 byte to the end of cmdline.txt (to terminate the string).
 mw.b ${cmdline_end} 0 1
 # ... and set string value of var bootargs to it.
 # Requires CONFIG_CMD_SETEXPR=y while building u-boot.
-setexpr.s bootargs *0x42000000
+setexpr.s bootargs *${ramdisk_addr_r}
 
 echo "Boot args: ${bootargs}"
 
 # Load dtb
-fatload mmc 2:1 0x44000000 exynos5422-odroidhc1.dtb
+setenv fdtfile exynos5422-odroidhc1.dtb
+load ${devtype} ${devnum}:${bootpart} ${fdt_addr_r} ${fdtfile}
 # ... and set fdt addr to it.
-fdt addr 0x44000000
+fdt addr ${fdt_addr_r}
+
+echo "Booting kernel ..."
 
 # Boot with compressed kernel without initrd
-bootz 0x40008000 - 0x44000000
+bootz ${kernel_addr_r} - ${fdt_addr_r}
