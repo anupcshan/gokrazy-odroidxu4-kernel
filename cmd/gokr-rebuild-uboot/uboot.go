@@ -39,10 +39,7 @@ var dockerFileTmpl = template.Must(template.New("dockerfile").
 	}).
 	Parse(dockerFileContents))
 
-var patchFiles = []string{
-	"boot.cmd",
-	"0003-revert.patch",
-}
+var patchFiles = []string{"boot.cmd"}
 
 func copyFile(dest, src string) error {
 	out, err := os.Create(dest)
