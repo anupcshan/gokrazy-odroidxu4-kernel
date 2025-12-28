@@ -1,22 +1,17 @@
-commit 5a3ee5a97412496598c5ece7939c8a6cf874603e
-Author: Anup Chenthamarakshan <anupcshan@gmail.com>
-Date:   Tue Oct 29 10:39:55 2024 -0700
-
-    Revert "mmc: exynos_dw_mmc: Set requested freq in get_mmc_clk() callback"
-    
-    This reverts commit 97e7d1c1f028bc4de75477f517a16f0de4a34d6d.
-
 diff --git a/drivers/mmc/exynos_dw_mmc.c b/drivers/mmc/exynos_dw_mmc.c
-index c8bf89d6d35..134e185adbb 100644
+index 7ccd113bd79..f1955313017 100644
 --- a/drivers/mmc/exynos_dw_mmc.c
 +++ b/drivers/mmc/exynos_dw_mmc.c
-@@ -166,17 +166,7 @@ static unsigned int exynos_dwmci_get_clk(struct dwmci_host *host, uint freq)
+@@ -195,20 +195,7 @@ static unsigned int exynos_dwmci_get_clk(struct dwmci_host *host, uint freq)
  	u8 clk_div;
  	int err;
  
--	/* Should be double rate for DDR mode */
--	if (host->mmc->selected_mode == MMC_DDR_52 && host->mmc->bus_width == 8)
+-	/* Should be double rate for DDR or HS mode */
+-	if ((host->mmc->selected_mode == MMC_DDR_52 &&
+-	     host->mmc->bus_width == 8) ||
+-	    host->mmc->selected_mode == MMC_HS_400) {
 -		freq *= 2;
+-	}
 -
  	clk_div = exynos_dwmmc_get_ciu_div(host);
 -	err = exynos_dwmmc_set_sclk(host, freq * clk_div);
