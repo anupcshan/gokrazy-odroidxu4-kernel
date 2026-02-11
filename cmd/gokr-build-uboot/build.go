@@ -11,8 +11,8 @@ import (
 	"strconv"
 )
 
-const ubootRev = "b99da05e1538b8fa153322da82917af2aa27e1d6"
-const ubootTS = 1770671270
+const ubootRev = "712765339a5c6576fdd5683748f97a1215868d5d"
+const ubootTS = 1770749822
 
 const (
 	uBootRepo = "https://github.com/u-boot/u-boot"
