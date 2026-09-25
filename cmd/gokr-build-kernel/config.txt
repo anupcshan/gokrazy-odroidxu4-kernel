@@ -19,3 +19,5 @@ CONFIG_EXTRA_FIRMWARE_DIR="/tmp/firmware"
 
 # Required for Tailscale
 CONFIG_TUN=y
+
+CONFIG_BTRFS_FS=y
